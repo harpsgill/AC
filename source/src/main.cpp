@@ -29,6 +29,9 @@ void cleanup(char *msg)         // single program exit point;
             dumpexecutionstack(clientlogfile);
         }
     }
+    
+    gamepad_quit();
+    
     SDL_Quit();
 }
 
@@ -793,7 +796,10 @@ static void checkmousemotion(int &dx, int &dy)
 int ignoremouse = 5, bootstrapentropy = 2;
 #define EVENTDEBUG(x) x
 //#define EVENTDEBUG(x)
-EVENTDEBUG(VAR(debugevents, 0, 1, 2));
+EVENTDEBUG(VARP(debugevents, 0, 1, 2));
+extern bool saycommandon;
+
+char axisstates[SDL_CONTROLLER_AXIS_MAX*2];
 
 void checkinput()
 {
@@ -944,14 +950,88 @@ void checkinput()
                     keypress(key, 0, false);
                 }
                 break;
+                
+            case SDL_CONTROLLERDEVICEADDED:
+                gamepad_controlleradded(event.cdevice.which);
+                conoutf("Controller added %d", event.cdevice.which);
+                break;
+                
+            case SDL_CONTROLLERDEVICEREMOVED:
+                gamepad_controllerremoved(event.cdevice.which);
+                conoutf("Controller removed %d", event.cdevice.which);
+                break;
+                
+            case SDL_CONTROLLERBUTTONDOWN:
+            case SDL_CONTROLLERBUTTONUP:
+                EVENTDEBUG(concatformatstring(eb, "(SDL_CONTROLLERBUTTONUP) which %d, button %d state %d", event.cbutton.which, event.cbutton.button, event.cbutton.state));
+                
+                if(saycommandon) break;
+//                if(lasttype==event.type && lastbut==event.cbutton.button) break;
+                
+                keypress(-event.cbutton.button-100, 0, event.cbutton.state!=0);
+                lasttype = event.type;
+                lastbut = event.cbutton.button;
+                break;
+                
+            case SDL_CONTROLLERAXISMOTION:
+                EVENTDEBUG(concatformatstring(eb, "(SDL_CONTROLLERAXISMOTION) which %d, axis %d value %d", event.caxis.which, event.caxis.axis, event.caxis.value));
+                if (event.caxis.axis >= SDL_CONTROLLER_AXIS_MAX) break;
+                int keymap_pos, keymap_neg;
+                
+                #define KEYMAP_AXIS_BASE 130
+                
+                keymap_pos = event.caxis.axis*2;
+                keymap_neg = keymap_pos + 1;
+                
+                if(saycommandon) break;
+                
+                // Check if the button was "pressed"
+                if ( abs(event.caxis.value) > 900 ) {
+                    // Get the direction. Then check and make sure the correct state is on, and the incorrect state is off.
+                    if (event.caxis.value >= 0) {
+                        if (!axisstates[keymap_pos]) {
+                            keypress(-keymap_pos - KEYMAP_AXIS_BASE, 0, 1);
+                            axisstates[keymap_pos] = 1;
+                        }
+                        if (axisstates[keymap_neg]) {
+                            keypress(-keymap_neg - KEYMAP_AXIS_BASE, 0, 0);
+                            axisstates[keymap_neg] = 0;
+                        }
+                    } else if(event.caxis.value < 0) {
+                        if (!axisstates[keymap_neg]) {
+                            keypress(-keymap_neg - KEYMAP_AXIS_BASE, 0, 1);
+                            axisstates[keymap_neg] = 1;
+                        }
+                        if (axisstates[keymap_pos]) {
+                            keypress(-keymap_pos - KEYMAP_AXIS_BASE, 0, 0);
+                            axisstates[keymap_pos] = 0;
+                        }
+                    }
+                } else if (abs(event.caxis.value) < 900 ) {
+                    if (axisstates[keymap_pos]) {
+                        keypress(-keymap_pos - KEYMAP_AXIS_BASE, 0, 0);
+                        axisstates[keymap_pos] = 0;
+                    }
+                    if (axisstates[keymap_neg]) {
+                        keypress(-keymap_neg - KEYMAP_AXIS_BASE, 0, 0);
+                        axisstates[keymap_neg] = 0;
+                    }
+                }
+                
+                #undef KEYMAP_AXIS_BASE
+                break;
+                
         }
         EVENTDEBUG(if(debugevents >= thres) conoutf("%s", eb));
     }
+    
     if(tdx || tdy)
     {
         entropy_add_byte(tdy + 5 * tdx);
         mousemove(tdx, tdy);
     }
+    
+    gamepad_look();
 }
 
 VARF(gamespeed, 10, 100, 1000, if(multiplayer()) gamespeed = 100);
@@ -1242,7 +1322,7 @@ int main(int argc, char **argv)
 #ifdef _DEBUG
     par = SDL_INIT_NOPARACHUTE;
 #endif
-    if(SDL_Init(SDL_INIT_TIMER|SDL_INIT_VIDEO|par)<0) fatal("Unable to initialize SDL");
+    if(SDL_Init(SDL_INIT_TIMER|SDL_INIT_VIDEO|SDL_INIT_GAMECONTROLLER|par)<0) fatal("Unable to initialize SDL");
     SDL_version sdlver;
     SDL_GetVersion(&sdlver);
     if(SDL_COMPILEDVERSION != SDL_VERSIONNUM(sdlver.major, sdlver.minor, sdlver.patch))
@@ -1277,6 +1357,9 @@ int main(int argc, char **argv)
 #endif
 
     SDL_ShowCursor(0);
+        
+    gamepad_init();
+
 
     initlog("gl");
     gl_checkextensions();

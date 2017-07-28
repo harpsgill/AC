@@ -7,6 +7,7 @@
 	objects = {
 
 /* Begin PBXBuildFile section */
+		1EB595DE1F291AD500317129 /* gamepad.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 1EB595DC1F291AD500317129 /* gamepad.cpp */; };
 		4F93906E1A1598140049877C /* SDL2_image.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 9EB8171611ED9AEF00799589 /* SDL2_image.framework */; };
 		4F9390711A15985A0049877C /* SDL2_image.framework in CopyFiles */ = {isa = PBXBuildFile; fileRef = 9EB8171611ED9AEF00799589 /* SDL2_image.framework */; };
 		4FEAF3381A147F9F00B42D47 /* SDL2.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 9EB8171511ED9AEF00799589 /* SDL2.framework */; };
@@ -125,6 +126,8 @@
 /* Begin PBXFileReference section */
 		089C165DFE840E0CC02AAC07 /* English */ = {isa = PBXFileReference; fileEncoding = 10; lastKnownFileType = text.plist.strings; name = English; path = English.lproj/InfoPlist.strings; sourceTree = "<group>"; };
 		1058C7A1FEA54F0111CA2CBB /* Cocoa.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = Cocoa.framework; path = /System/Library/Frameworks/Cocoa.framework; sourceTree = "<absolute>"; };
+		1EB595DC1F291AD500317129 /* gamepad.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = gamepad.cpp; sourceTree = "<group>"; };
+		1EB595DD1F291AD500317129 /* gamepad.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = gamepad.h; sourceTree = "<group>"; };
 		29B97324FDCFA39411CA2CEA /* AppKit.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = AppKit.framework; path = /System/Library/Frameworks/AppKit.framework; sourceTree = "<absolute>"; };
 		29B97325FDCFA39411CA2CEA /* Foundation.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = Foundation.framework; path = /System/Library/Frameworks/Foundation.framework; sourceTree = "<absolute>"; };
 		665CDC6B0AFE7ECC0030D605 /* callbacks.c */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.c.c; path = callbacks.c; sourceTree = "<group>"; };
@@ -464,6 +467,8 @@
 				B914CE8B11CAC42F009BA307 /* worldocull.cpp */,
 				B914CE8C11CAC42F009BA307 /* worldrender.cpp */,
 				B914CE8D11CAC42F009BA307 /* zip.cpp */,
+				1EB595DC1F291AD500317129 /* gamepad.cpp */,
+				1EB595DD1F291AD500317129 /* gamepad.h */,
 			);
 			name = src;
 			path = ../src;
@@ -615,6 +620,7 @@
 				665CDD0E0AFE7ED80030D605 /* ac_bot.cpp in Sources */,
 				665CDD100AFE7ED80030D605 /* ac_bot_ai.cpp in Sources */,
 				665CDD110AFE7ED80030D605 /* bot.cpp in Sources */,
+				1EB595DE1F291AD500317129 /* gamepad.cpp in Sources */,
 				665CDD130AFE7ED80030D605 /* bot_ai.cpp in Sources */,
 				665CDD140AFE7ED80030D605 /* bot_util.cpp in Sources */,
 				665CDD160AFE7ED80030D605 /* bot_waypoint.cpp in Sources */,
